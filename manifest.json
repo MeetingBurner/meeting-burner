@@ -1,13 +1,16 @@
 {
   "manifest_version": 3,
   "name": "Meeting Burner Ticker",
-  "version": "1.0.1",
+  "version": "1.1",
   "description": "Track the real-time cost of your meetings.",
   "icons": {
+    "16": "icon.png",
+    "32": "icon.png",
+    "48": "icon.png",
     "128": "icon.png"
   },
   "action": {
-    "default_popup": "index.html"
-  },
-  "permissions": []
+    "default_popup": "index.html",
+    "default_icon": "icon.png"
+  }
 }
