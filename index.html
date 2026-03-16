@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Meeting Burner</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; background: #0f172a; color: #f1f5f9; margin: 0; }
+        .card { background: #1e293b; padding: 2.5rem; border-radius: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.3); text-align: center; width: 400px; border: 1px solid #334155; position: relative; }
+        .input-group { text-align: left; margin-bottom: 15px; }
+        label { display: block; font-size: 0.85rem; color: #94a3b8; margin-bottom: 5px; font-weight: bold; text-transform: uppercase; }
+        input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: #4ade80; font-size: 1rem; box-sizing: border-box; }
+        #ticker { font-size: 4rem; font-weight: 800; color: #4ade80; margin: 30px 0; font-family: monospace; }
+        
+        .btn-container { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        button { padding: 14px; font-weight: bold; cursor: pointer; border-radius: 8px; border: none; transition: 0.2s; }
+        #startBtn { background: #10b981; color: white; grid-column: span 2; }
+        #endBtn { background: #f43f5e; color: white; }
+        #resetBtn { background: #64748b; color: white; }
+        button:hover { opacity: 0.9; }
+
+        #modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); justify-content: center; align-items: center; z-index: 10; }
+        .modal-content { background: #1e293b; padding: 30px; border-radius: 15px; width: 300px; border: 2px solid #4ade80; text-align: center; }
+        .coffee-icon { font-size: 3rem; margin-bottom: 10px; }
+        .close-btn { background: #4ade80; color: #0f172a; margin-top: 20px; width: 100%; }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <h2>Meeting Burner</h2>
+        <div class="input-group"><label>Attendees</label><input type="number" id="people" value="5"></div>
+        <div class="input-group"><label>Avg. Hourly Rate ($)</label><input type="number" id="rate" value="50"></div>
+        <div id="ticker">$0.00</div>
+        <div class="btn-container">
+            <button id="startBtn">Start Meeting</button>
+            <button id="endBtn">End Meeting</button>
+            <button id="resetBtn">Reset</button>
+        </div>
+    </div>
+
+    <div id="modal">
+        <div class="modal-content">
+            <div class="coffee-icon">☕</div>
+            <h3>Meeting Summary</h3>
+            <p id="summaryText"></p>
+            <button class="close-btn" onclick="closeModal()">Got it</button>
+        </div>
+    </div>
+
+    <script>
+        let totalCost = 0;
+        let timer = null;
+        let isRunning = false;
+
+        const tickerDisplay = document.getElementById('ticker');
+        const startBtn = document.getElementById('startBtn');
+        const modal = document.getElementById('modal');
+        const summaryText = document.getElementById('summaryText');
+
+        startBtn.addEventListener('click', () => {
+            if (isRunning) {
+                clearInterval(timer);
+                startBtn.innerText = "Resume Meeting";
+                isRunning = false;
+            } else {
+                const people = parseFloat(document.getElementById('people').value) || 0;
+                const rate = parseFloat(document.getElementById('rate').value) || 0;
+                const costPerSecond = (people * rate) / 3600;
+
+                timer = setInterval(() => {
+                    totalCost += costPerSecond;
+                    tickerDisplay.innerText = "$" + totalCost.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                }, 1000);
+
+                startBtn.innerText = "Pause Meeting";
+                isRunning = true;
+            }
+        });
+
+        document.getElementById('endBtn').addEventListener('click', () => {
+            clearInterval(timer);
+            isRunning = false;
+            const coffees = Math.floor(totalCost / 4);
+            // Updated text: No coffee price and no full stops
+            summaryText.innerHTML = `This meeting cost <b>$${totalCost.toFixed(2)}</b><br><br>That's equivalent to <b>${coffees}</b> cups of coffee`;
+            modal.style.display = 'flex';
+        });
+
+        document.getElementById('resetBtn').addEventListener('click', () => {
+            clearInterval(timer);
+            totalCost = 0;
+            isRunning = false;
+            tickerDisplay.innerText = "$0.00";
+            startBtn.innerText = "Start Meeting";
+        });
+
+        function closeModal() { modal.style.display = 'none'; }
+    </script>
+</body>
+</html>
